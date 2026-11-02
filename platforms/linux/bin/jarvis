@@ -3,8 +3,16 @@
 set -Eeuo pipefail
 
 ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../../.." && pwd)"
+cd "$ROOT_DIR"
+
 COMPOSE_FILE="$ROOT_DIR/docker/compose.yaml"
 ENV_FILE="$ROOT_DIR/docker/.env"
+
+if [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then
+    PYTHON="$ROOT_DIR/.venv/bin/python"
+else
+    PYTHON="$(command -v python3 || true)"
+fi
 
 source "$ROOT_DIR/platforms/linux/services/docker.sh"
 source "$ROOT_DIR/platforms/linux/services/ollama.sh"
@@ -12,7 +20,9 @@ source "$ROOT_DIR/platforms/linux/services/ollama.sh"
 usage() {
     echo "JARVIS Linux Control"
     echo
-    echo "Usage: jarvis {start|stop|restart|status|logs|help}"
+    echo 'Usage: jarvis "your question"'
+    echo '       jarvis --local "your private question"'
+    echo "       jarvis {start|stop|restart|status|logs|help}"
     echo
     echo "Commands:"
     echo "  start    Start Docker, Ollama and Open WebUI"
@@ -45,41 +55,67 @@ show_status() {
     fi
 }
 
-case "${1:-}" in
-    help|--help|-h)
-        usage
-        exit 0
-        ;;
-    start)
-        ensure_docker
-        start_ollama
-        check_compose_files
-        compose up -d
-        echo "Open WebUI: started"
-        compose ps
-        ;;
-    stop)
-        ensure_docker
-        check_compose_files
-        compose stop
-        echo "Open WebUI: stopped"
-        ;;
-    restart)
-        ensure_docker
-        check_compose_files
-        compose restart
-        echo "Open WebUI: restarted"
-        ;;
-    status)
-        show_status
-        ;;
-    logs)
-        ensure_docker
-        check_compose_files
-        compose logs -f
-        ;;
-    *)
-        usage
-        exit 2
-        ;;
-esac
+if [[ $# -eq 1 ]]; then
+    case "${1,,}" in
+        help|--help|-h)
+            usage
+            exit 0
+            ;;
+        start)
+            ensure_docker
+            start_ollama
+            check_compose_files
+            compose start
+            echo "Open WebUI: started"
+            compose ps
+            exit 0
+            ;;
+        stop)
+            ensure_docker
+            check_compose_files
+            compose stop
+            echo "Open WebUI: stopped"
+            exit 0
+            ;;
+        restart)
+            ensure_docker
+            check_compose_files
+            compose restart
+            echo "Open WebUI: restarted"
+            exit 0
+            ;;
+        status)
+            show_status
+            exit 0
+            ;;
+        logs)
+            ensure_docker
+            check_compose_files
+            compose logs -f
+            exit 0
+            ;;
+    esac
+fi
+
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 1
+fi
+
+if [[ "${1:-}" == -* && "${1:-}" != "--local" ]]; then
+    echo "Error: unknown option: $1" >&2
+    usage
+    exit 2
+fi
+
+if [[ "${1:-}" == "--local" && $# -lt 2 ]]; then
+    echo "Error: missing question after --local." >&2
+    exit 1
+fi
+
+if [[ -z "$PYTHON" ]]; then
+    echo "Error: Python 3 is not installed or available."
+    exit 1
+fi
+
+exec "$PYTHON" -m core.python.chat "$@"

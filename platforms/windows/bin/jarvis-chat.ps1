@@ -1,66 +1,57 @@
-# jarvis-chat.ps1 - send one question to JARVIS from the terminal
-# jarvis "question"          -> cloud preset (jarvis-cloud)
-# jarvis --local "question"  -> private preset (jarvis-private)
+# JARVIS Windows chat adapter
+# Chat logic is shared in core/python/chat.py.
+
 param(
     [Parameter(ValueFromRemainingArguments = $true)]
     [string[]]$Words
 )
 
-# Show UTF-8 correctly in the terminal (emoji, accents, symbols)
-try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
+$ErrorActionPreference = "Stop"
 
-$BaseUrl      = "http://127.0.0.1:3000"
-$CloudModel   = "-jarvis-cloud"
-$PrivateModel = "-jarvis-local"
+# Preserve the previous Windows user-level API key behaviour.
+if (-not $env:JARVIS_API_KEY) {
+    $UserKey = [Environment]::GetEnvironmentVariable("JARVIS_API_KEY", "User")
 
-$useLocal = $false
-$parts = @()
-foreach ($w in $Words) {
-    if ($w -eq "--local") { $useLocal = $true } else { $parts += $w }
+    if ($UserKey) {
+        $env:JARVIS_API_KEY = $UserKey
+    }
 }
-$question = ($parts -join " ").Trim()
 
-if (-not $question) {
+if (-not $env:JARVIS_API_KEY) {
+    Write-Error "JARVIS_API_KEY is not set. Configure it as a Windows user environment variable."
+    exit 1
+}
+
+$env:PYTHONIOENCODING = "utf-8"
+
+$Root = (Resolve-Path (Join-Path $PSScriptRoot "../../..")).Path
+Set-Location -LiteralPath $Root
+
+$VenvPython = Join-Path $Root ".venv/Scripts/python.exe"
+
+if (Test-Path -LiteralPath $VenvPython -PathType Leaf) {
+    $Python = $VenvPython
+}
+else {
+    $PythonCommand = Get-Command python -CommandType Application -ErrorAction SilentlyContinue
+
+    if (-not $PythonCommand) {
+        $PythonCommand = Get-Command python3 -CommandType Application -ErrorAction SilentlyContinue
+    }
+
+    if (-not $PythonCommand) {
+        Write-Error "Python 3 was not found. Install Python 3 or create a project .venv."
+        exit 1
+    }
+
+    $Python = $PythonCommand.Source
+}
+
+if (-not $Words -or $Words.Count -eq 0) {
     Write-Host 'Usage: jarvis "your question"'
     Write-Host '       jarvis --local "your private question"'
     exit 1
 }
 
-$key = [Environment]::GetEnvironmentVariable("JARVIS_API_KEY", "User")
-if (-not $key) { $key = $env:JARVIS_API_KEY }
-if (-not $key) {
-    Write-Host "JARVIS_API_KEY is not set. Add it as a Windows user environment variable, then open a NEW terminal."
-    exit 1
-}
-
-$model = if ($useLocal) { $PrivateModel } else { $CloudModel }
-$label = if ($useLocal) { "PRIVATE, local, nothing leaves this PC" } else { "CLOUD, Gemini" }
-Write-Host "[$label] model: $model"
-
-$body = @{
-    model    = $model
-    messages = @(@{ role = "user"; content = $question })
-    stream   = $false
-} | ConvertTo-Json -Depth 5
-$bytes = [System.Text.Encoding]::UTF8.GetBytes($body)
-
-try {
-    # Read the raw bytes and decode them as UTF-8 ourselves
-    $resp = Invoke-WebRequest -Uri "$BaseUrl/api/chat/completions" -Method Post `
-        -Headers @{ Authorization = "Bearer $key" } `
-        -ContentType "application/json; charset=utf-8" `
-        -Body $bytes -TimeoutSec 240 -UseBasicParsing
-
-    $raw  = [System.Text.Encoding]::UTF8.GetString($resp.RawContentStream.ToArray())
-    $json = $raw | ConvertFrom-Json
-
-    $answer = $json.choices[0].message.content
-    $answer = ($answer -replace '(?s)<think>.*?</think>', '').Trim()
-    Write-Host ""
-    Write-Host $answer
-}
-catch {
-    Write-Host "Request failed: $($_.Exception.Message)"
-    if (-not $useLocal) { Write-Host "If this is a 429 or rate-limit error, wait a minute or use --local." }
-    exit 1
-}
+& $Python -m core.python.chat @Words
+exit $LASTEXITCODE
