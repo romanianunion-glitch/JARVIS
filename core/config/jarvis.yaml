@@ -3,6 +3,13 @@
 app:
   name: Dum-E
   version: "0.1.0"
+  instances:
+    windows:
+      name: Dum-E — Windows
+      deployment_id: dum-e-windows
+    linux:
+      name: JARVIS — CachyOS
+      deployment_id: jarvis-cachyos
 
 webui:
   container: open-webui
