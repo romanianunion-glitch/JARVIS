@@ -1,0 +1,46 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+credentials/
+
+# Backups
+*.bak
+*.backup
+*.tar
+*.tar.gz
+*.zip
+backups/
+
+# Logs
+*.log
+logs/
+
+# Databases and persistent data
+*.db
+*.sqlite
+volumes/
+data/
+
+# Models
+models/
+*.gguf
+*.safetensors
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node
+node_modules/
+dist/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
