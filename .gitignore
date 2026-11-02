@@ -1,17 +1,39 @@
-# Secrets
+# Secrets and private configuration
 .env
 .env.*
 !.env.example
 *.pem
 *.key
+*.p12
+*.pfx
+*.ppk
+id_rsa
+id_ed25519
+id_ecdsa
+id_dsa
 secrets/
 credentials/
+.private/
+*.secret
+*.token
+.npmrc
+.pypirc
+.netrc
 
-# Backups
+# Cloud and local credential stores
+.aws/
+.azure/
+.gcloud/
+.kube/
+
+# Backups and archives
 *.bak
 *.backup
+*.old
+*.orig
 *.tar
 *.tar.gz
+*.tgz
 *.zip
 backups/
 
@@ -19,11 +41,19 @@ backups/
 *.log
 logs/
 
-# Databases and persistent data
+# Databases and persistent application data
 *.db
+*.db-*
 *.sqlite
+*.sqlite-*
+*.sqlite3
 volumes/
 data/
+
+# Infrastructure state
+.terraform/
+*.tfstate
+*.tfstate.*
 
 # Models
 models/
