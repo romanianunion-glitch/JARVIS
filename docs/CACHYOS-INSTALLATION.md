@@ -94,6 +94,14 @@ This creates `docker/.env`. If you intentionally want to regenerate an existing 
 
 Review `docker/.env` before starting services. Never commit this file or put API keys in it.
 
+The generated file automatically selects the **CachyOS** identity:
+- `JARVIS_NAME=JARVIS — CachyOS`
+- `JARVIS_DEPLOYMENT_ID=jarvis-cachyos`
+
+Open WebUI uses `WEBUI_NAME` for the name in its default PWA manifest (and appends `(Open WebUI)`). This gives the Windows and CachyOS instances different install names when each is opened through its own Tailscale Serve hostname. Tailscale Serve publishes the local web app; it does not set the identity itself.
+
+If `docker/.env` already existed before this update, the generator will leave it untouched. Update the two values above manually in that file; do not use `--force` unless you intend to regenerate the entire file.
+
 ## 6. First-time Open WebUI setup
 
 The JARVIS `start` command starts an existing container. It does not create a new container on a fresh installation.
