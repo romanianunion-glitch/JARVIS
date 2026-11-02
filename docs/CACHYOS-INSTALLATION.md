@@ -160,7 +160,62 @@ The key is available to JARVIS chat commands launched from this shell. Set it ag
 
 Never paste API keys into source files, documentation, Git commits, or shared screenshots.
 
-## 10. JARVIS commands
+## 10. Add JARVIS to PATH
+
+The launcher can resolve the repository directory itself, so you can create a small symlink in `~/.local/bin` and run `jarvis` from any directory.
+
+The commands below assume you cloned the repository to `~/JARVIS`, as in section 3. If you chose another location, replace that path with your actual repository directory.
+
+Create the user-local command:
+
+```bash
+mkdir -p "$HOME/.local/bin"
+ln -sfn "$HOME/JARVIS/platforms/linux/bin/jarvis" "$HOME/.local/bin/jarvis"
+```
+
+Make sure `~/.local/bin` is on your PATH.
+
+### Fish shell (CachyOS default on many installations)
+
+```fish
+fish_add_path "$HOME/.local/bin"
+```
+
+`fish_add_path` saves the path for future Fish sessions. Open a new terminal if needed.
+
+### Bash or Zsh
+
+Add this line to `~/.bashrc` (Bash) or `~/.zshrc` (Zsh):
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Then reload the matching file, for example:
+
+```bash
+source ~/.bashrc
+```
+
+Verify that the command resolves:
+
+```bash
+command -v jarvis
+jarvis help
+```
+
+You can now run JARVIS from your home prompt or any other directory:
+
+```bash
+cd "$HOME"
+jarvis start
+jarvis status
+jarvis "Good evening, JARVIS."
+```
+
+The symlink points to the launcher inside your repository. Keep the repository in place; moving it requires recreating the symlink.
+
+## 11. JARVIS commands
 
 From the repository directory:
 
@@ -185,7 +240,7 @@ Chat using the private/local model:
 ./platforms/linux/bin/jarvis --local "Hello, JARVIS."
 ```
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 ### Docker is unavailable
 
@@ -222,7 +277,7 @@ Also verify that Open WebUI can reach the Ollama host endpoint and that the conf
 
 Check that `JARVIS_API_KEY` is set in the current shell and that it belongs to the correct Open WebUI account.
 
-## 12. Updates and maintenance
+## 13. Updates and maintenance
 
 Pull repository changes only when your working tree is clean, or after safely handling your local changes:
 
@@ -235,7 +290,7 @@ Back up important Open WebUI data before upgrades. Its named Docker volume conta
 
 Do not use `docker compose down -v` unless you intentionally want to delete the persistent volume and its data.
 
-## 13. Security and data
+## 14. Security and data
 
 - Keep API keys and credentials outside the Git repository.
 - Keep `docker/.env` private and untracked.
