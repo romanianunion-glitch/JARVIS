@@ -15,6 +15,7 @@ def generate_env(config):
     app_name = get_config_value(config, "app", "name")
     webui_image = get_config_value(config, "webui", "image")
     webui_container = get_config_value(config, "webui", "container")
+    webui_host_ip = get_config_value(config, "webui", "host_ip")
     webui_port = get_config_value(config, "webui", "host_port")
     webui_volume = get_config_value(config, "webui", "volume")
     ollama_port = get_config_value(config, "ollama", "port")
@@ -23,6 +24,7 @@ def generate_env(config):
         "JARVIS_NAME": app_name,
         "WEBUI_IMAGE": webui_image,
         "WEBUI_CONTAINER": webui_container,
+        "WEBUI_HOST_IP": webui_host_ip,
         "WEBUI_HOST_PORT": webui_port,
         "WEBUI_VOLUME": webui_volume,
         "OLLAMA_BASE_URL": f"http://host.docker.internal:{ollama_port}",

@@ -1,11 +1,11 @@
 services:
   open-webui:
-    image: ${WEBUI_IMAGE:-ghcr.io/open-webui/open-webui}
+    image: ${WEBUI_IMAGE:-ghcr.io/open-webui/open-webui:v0.12.5}
     container_name: ${WEBUI_CONTAINER:-open-webui}
     restart: unless-stopped
 
     ports:
-      - "${WEBUI_HOST_PORT:-3000}:8080"
+      - "${WEBUI_HOST_IP:-127.0.0.1}:${WEBUI_HOST_PORT:-3000}:8080"
 
     extra_hosts:
       - "host.docker.internal:host-gateway"

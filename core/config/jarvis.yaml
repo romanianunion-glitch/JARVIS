@@ -6,7 +6,8 @@ app:
 
 webui:
   container: open-webui
-  image: ghcr.io/open-webui/open-webui
+  image: ghcr.io/open-webui/open-webui:v0.12.5
+  host_ip: 127.0.0.1
   host_port: 3000
   container_port: 8080
   volume: open-webui
