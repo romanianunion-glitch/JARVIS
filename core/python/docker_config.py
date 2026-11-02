@@ -11,8 +11,16 @@ ROOT = Path(__file__).resolve().parents[2]
 ENV_FILE = ROOT / "docker" / ".env"
 
 
-def generate_env(config):
-    app_name = get_config_value(config, "app", "name")
+def detect_platform():
+    return "windows" if sys.platform == "win32" else "linux"
+
+
+def generate_env(config, platform=None):
+    platform = platform or detect_platform()
+    instance = get_config_value(config, "app", "instances", platform)
+
+    app_name = get_config_value(instance, "name")
+    deployment_id = get_config_value(instance, "deployment_id")
     webui_image = get_config_value(config, "webui", "image")
     webui_container = get_config_value(config, "webui", "container")
     webui_host_ip = get_config_value(config, "webui", "host_ip")
@@ -22,6 +30,7 @@ def generate_env(config):
 
     values = {
         "JARVIS_NAME": app_name,
+        "JARVIS_DEPLOYMENT_ID": deployment_id,
         "WEBUI_IMAGE": webui_image,
         "WEBUI_CONTAINER": webui_container,
         "WEBUI_HOST_IP": webui_host_ip,
@@ -45,7 +54,7 @@ def main():
         return 1
 
     ENV_FILE.write_text(content, encoding="utf-8")
-    print(f"Docker environment generated: {ENV_FILE}")
+    print(f"Docker environment generated for {detect_platform()}: {ENV_FILE}")
     return 0
 
 
