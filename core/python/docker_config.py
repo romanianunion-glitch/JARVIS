@@ -1,7 +1,10 @@
 from pathlib import Path
 import sys
 
-from config import load_config, get_config_value
+if __package__:
+    from .config import load_config, get_config_value
+else:
+    from config import load_config, get_config_value
 
 
 ROOT = Path(__file__).resolve().parents[2]
