@@ -13,5 +13,5 @@ Cross-platform personal AI assistant.
 
 ## Platforms
 
-- Windows 11
-- Arch Linux / CachyOS
+- Windows 11 — see [Windows installation guide](docs/WINDOWS-INSTALLATION.md).
+- Arch Linux / CachyOS — see [CachyOS installation guide](docs/CACHYOS-INSTALLATION.md).
