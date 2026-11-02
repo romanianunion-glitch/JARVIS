@@ -2,6 +2,7 @@ param(
     [string]$Version,          # optional, example: v0.12.4 (empty = auto-detect latest release)
     [int]$KeepBackups = 2,     # how many backups to keep
     [switch]$AutoRestart,      # start the container automatically after reboots
+    [string]$ExternalPwaManifestUrl = $env:EXTERNAL_PWA_MANIFEST_URL, # optional custom PWA manifest URL
     [switch]$Yes               # skip the confirmation question
 )
 
@@ -25,9 +26,11 @@ function Start-OpenWebUI($tag) {
         "-v", "${Volume}:/app/backend/data",
         "-e", "OLLAMA_BASE_URL=http://host.docker.internal:11434",
         "-e", "WEBUI_NAME=Dum-E",
-        "-e", "EXTERNAL_PWA_MANIFEST_URL=https://dum-e.tail51aafe.ts.net/jarvis-assets/manifest.json",
         "--name", $Name
     )
+    if ($ExternalPwaManifestUrl) {
+        $runArgs += @("-e", "EXTERNAL_PWA_MANIFEST_URL=$ExternalPwaManifestUrl")
+    }
     if ($AutoRestart) { $runArgs += @("--restart", "unless-stopped") }
     $runArgs += "${Image}:$tag"
 
