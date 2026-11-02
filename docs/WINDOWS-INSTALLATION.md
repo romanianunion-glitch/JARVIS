@@ -104,6 +104,14 @@ This creates `docker\.env`. If the file already exists, the generator will not o
 
 Review the generated file if needed. Do not put provider API keys in it, commit it, or share it.
 
+The generated file automatically selects the **Windows 11** identity:
+- `JARVIS_NAME=Dum-E — Windows`
+- `JARVIS_DEPLOYMENT_ID=dum-e-windows`
+
+Open WebUI uses `WEBUI_NAME` for the name in its default PWA manifest (and appends `(Open WebUI)`). This gives the Windows and CachyOS instances different install names when each is opened through its own Tailscale Serve hostname. Tailscale Serve publishes the local web app; it does not set the identity itself.
+
+If `docker/.env` already existed before this update, the generator will leave it untouched. Update the two values above manually in that file; do not use `--force` unless you intend to regenerate the entire file.
+
 ## 6. First-time Open WebUI setup
 
 The JARVIS `start` command starts an existing Open WebUI container. It does not create a container on a fresh installation.
