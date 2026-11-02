@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "JARVIS — CachyOS",
+  "short_name": "JARVIS",
+  "description": "Your personal AI assistant on Arch Linux and CachyOS",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#101820",
+  "theme_color": "#101820",
+  "icons": [
+    {
+      "src": "jarvis.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
