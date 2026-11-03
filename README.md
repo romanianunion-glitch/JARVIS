@@ -54,6 +54,12 @@ Open WebUI provider connections and credentials are stored in its persistent dat
 | `pwa/` | Progressive Web App assets |
 | `docs/` | Installation and setup guides |
 
+## Copyright and attribution
+
+Copyright (c) 2026 romanianunion-glitch. All rights reserved.
+
+JARVIS is the original work of `romanianunion-glitch`. If you fork, modify, or redistribute this project, retain the original copyright and license notice in the [`LICENSE`](LICENSE) file as required by the MIT License. You may add your own copyright notice for your modifications, but that does not replace or remove the original attribution.
+
 ## License
 
-JARVIS is licensed under the [MIT License](LICENSE). You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the license terms and inclusion of the copyright and permission notice.
+JARVIS is licensed under the [MIT License](LICENSE). The license permits use, modification, and redistribution, including commercially, provided the required copyright and permission notice is included.
