@@ -1,6 +1,6 @@
 # JARVIS on CachyOS/Arch-based
 
-Installation and setup instructions for running JARVIS natively on CachyOS.
+Installation and setup instructions for running JARVIS natively on CachyOS/Arch-based distros.
 
 JARVIS uses a shared Python core, Docker Compose for Open WebUI, and optionally native Ollama for local inference.
 
