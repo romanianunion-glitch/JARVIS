@@ -361,7 +361,7 @@ There are two separate things to update:
 - Git pull updates the JARVIS repository files. It does not update the Open WebUI image or the running container.
 - Docker Compose pulls the configured Open WebUI image and recreates the container. The named Docker volume keeps your Open WebUI account, settings, provider connections, and other persistent data.
 
-### 13.1 Update the repository safely
+### Update the repository safely
 
 From the JARVIS repository root:
 
@@ -377,7 +377,7 @@ git pull --ff-only
 
 Do not use a force operation to overwrite local work. If Git reports that the branches have diverged, stop and inspect the local commits instead of forcing the update.
 
-### 13.2 Back up Open WebUI before updating its container
+### Back up Open WebUI before updating its container
 
 The default persistent Docker volume is open-webui (the actual name can be changed with WEBUI_VOLUME in docker/.env). The backup below identifies the existing Compose container and archives its mounted data volume, so it also works when the volume has a custom name.
 
@@ -421,7 +421,7 @@ If the backup command fails after stopping Open WebUI, start it again with:
 docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml start open-webui
 ~~~
 
-### 13.3 Pull and apply the Open WebUI container update
+### Pull and apply the Open WebUI container update
 
 After the repository update and a successful backup, pull the image specified by docker/compose.yaml and recreate the service:
 
