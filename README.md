@@ -56,4 +56,4 @@ Open WebUI provider connections and credentials are stored in its persistent dat
 
 ## License
 
-This repository currently has no license file. Public visibility alone does not grant permission to reuse, modify, or redistribute the code. A license should be chosen and added before explicitly inviting outside contributions or reuse.
+JARVIS is licensed under the [MIT License](LICENSE). You may use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the license terms and inclusion of the copyright and permission notice.
