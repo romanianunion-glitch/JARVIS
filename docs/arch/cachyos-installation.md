@@ -54,6 +54,42 @@ Log out and back in for group membership to take effect.
 This permission is required by the current JARVIS launcher unless you configure Docker rootless mode separately.
 **Security note:** membership in the Docker group grants privileges effectively equivalent to root. Only do this if you understand and accept that risk.
 
+
+### Tailscale (optional, for access from your other devices)
+
+Tailscale is not required to run JARVIS locally. Install it if you want to reach this CachyOS instance from other devices in your tailnet.
+
+Install the Arch package and start its daemon:
+
+~~~bash
+sudo pacman -S --needed tailscale
+sudo systemctl enable --now tailscaled
+~~~
+
+Join your tailnet and authenticate using the URL printed by the command:
+
+~~~bash
+sudo tailscale up
+~~~
+
+Verify the connection:
+
+~~~bash
+tailscale status
+tailscale ip -4
+~~~
+
+To make the local Open WebUI available to your tailnet over HTTPS, first complete the Open WebUI setup in section 6, then run:
+
+~~~bash
+tailscale serve --bg 3000
+tailscale serve status
+~~~
+
+Use the HTTPS hostname shown by the Serve status on your other tailnet devices. Tailscale Serve is private to your tailnet; do not use Tailscale Funnel for this setup. Serve may prompt you to enable HTTPS certificates for your tailnet. Access is still governed by your tailnet access controls. To remove the Serve configuration later, run tailscale serve reset.
+
+Official references: [Tailscale on Linux](https://tailscale.com/docs/install/linux) · [Tailscale Serve](https://tailscale.com/docs/reference/tailscale-cli/serve).
+
 ## 3. Clone the repository
 
 ```bash
@@ -318,18 +354,94 @@ Also verify that Open WebUI can reach the Ollama host endpoint and that the conf
 
 Check that `JARVIS_API_KEY` is set in the current shell and that it belongs to the correct Open WebUI account.
 
-## 13. Updates and maintenance
+## 13. Updates, backups, and maintenance
 
-Pull repository changes only when your working tree is clean, or after safely handling your local changes:
+There are two separate things to update:
 
-```bash
-git status
+- Git pull updates the JARVIS repository files. It does not update the Open WebUI image or the running container.
+- Docker Compose pulls the configured Open WebUI image and recreates the container. The named Docker volume keeps your Open WebUI account, settings, provider connections, and other persistent data.
+
+### 13.1 Update the repository safely
+
+From the JARVIS repository root:
+
+~~~bash
+git status --short --branch
+~~~
+
+If you have local changes, commit them or safely stash them before pulling. Do not discard work just to make the update proceed. Then fast-forward to the latest published commit:
+
+~~~bash
 git pull --ff-only
-```
+~~~
 
-Back up important Open WebUI data before upgrades. Its named Docker volume contains persistent application data.
+Do not use a force operation to overwrite local work. If Git reports that the branches have diverged, stop and inspect the local commits instead of forcing the update.
 
-Do not use `docker compose down -v` unless you intentionally want to delete the persistent volume and its data.
+### 13.2 Back up Open WebUI before updating its container
+
+The default persistent Docker volume is open-webui (the actual name can be changed with WEBUI_VOLUME in docker/.env). The backup below identifies the existing Compose container and archives its mounted data volume, so it also works when the volume has a custom name.
+
+Run the following commands in Bash from the repository root. If your terminal is Fish, enter bash first:
+
+~~~bash
+mkdir -p backups
+
+WEBUI_CONTAINER_ID=$(docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml ps -aq open-webui)
+
+if [[ -z "$WEBUI_CONTAINER_ID" ]]; then
+    echo "Open WebUI container was not found. Complete the first-time setup in section 6 first."
+    exit 1
+fi
+
+BACKUP_NAME="open-webui-$(date +%F-%H%M%S).tar.gz"
+
+# Stop writes so the archive is consistent.
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml stop open-webui
+
+# Archive the persistent /app/backend/data volume.
+docker run --rm \
+    --volumes-from "$WEBUI_CONTAINER_ID" \
+    -v "$PWD/backups:/backup" \
+    busybox sh -c 'tar -czf "/backup/$1" -C /app/backend/data .' sh "$BACKUP_NAME"
+
+# Start Open WebUI again after the backup.
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml start open-webui
+
+# Confirm that the archive exists and can be listed.
+tar -tzf "backups/$BACKUP_NAME" | head
+
+echo "Backup created: backups/$BACKUP_NAME"
+~~~
+
+The repository .gitignore already excludes the backups/ directory and archive files. Keep these backups somewhere safe; they contain private Open WebUI data, including account and provider configuration. Do not upload them to GitHub or share them.
+
+If the backup command fails after stopping Open WebUI, start it again with:
+
+~~~bash
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml start open-webui
+~~~
+
+### 13.3 Pull and apply the Open WebUI container update
+
+After the repository update and a successful backup, pull the image specified by docker/compose.yaml and recreate the service:
+
+~~~bash
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml pull open-webui
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml up -d --remove-orphans
+~~~
+
+Unlike docker compose start, up -d applies image and Compose configuration changes and recreates the container when needed. The named volume is reused, so your existing Open WebUI data remains in place.
+
+Verify the result:
+
+~~~bash
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml ps
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml logs --tail=100 open-webui
+~~~
+
+Then open http://127.0.0.1:3000 and confirm that your account, models, and provider connections are still present.
+
+Never run docker compose down -v as a routine update command. The -v option removes named volumes and can delete your persistent Open WebUI data.
 
 ## 14. Security and data
 
