@@ -425,6 +425,9 @@ docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compo
 
 After the repository update and a successful backup, pull the image specified by docker/compose.yaml and recreate the service:
 
+The current repository configuration pins Open WebUI to ghcr.io/open-webui/open-webui:v0.12.5. The commands below re-pull the configured tag; they do not automatically switch to a newer Open WebUI release. To upgrade to a different release, first choose a version you intend to run, then update both the webui.image value in core/config/jarvis.yaml and WEBUI_IMAGE in docker/.env to the same image tag. Existing docker/.env files are not overwritten by the configuration generator, so changing only the YAML file is not enough on an existing installation. Back up first, then run the pull and recreate commands below.
+
+
 ~~~bash
 docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml pull open-webui
 docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml up -d --remove-orphans
