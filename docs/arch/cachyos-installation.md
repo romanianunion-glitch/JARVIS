@@ -1,4 +1,4 @@
-# JARVIS on CachyOS
+# JARVIS on CachyOS/Arch-based
 
 Installation and setup instructions for running JARVIS natively on CachyOS.
 
