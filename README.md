@@ -20,6 +20,16 @@ Each guide covers prerequisites, Docker setup, Python environment, first-time Op
 - Separate platform identities and deployment configuration.
 - Explicit approval for actions that can affect the host system.
 
+## Supported setup and alternatives
+
+The installation guides describe the **reference setup that this project is developed and tested with**. Following those guides is the recommended way to get a working JARVIS installation.
+
+You're welcome to experiment with alternatives, replace components, or build your own fork. For example, you could use a different frontend instead of Open WebUI, another container runtime instead of Docker, or a different networking solution instead of Tailscale if you use it for remote access.
+
+Keep in mind that these components are connected to the scripts, configuration, networking, and setup instructions around them. Replacing one may require you to adapt those parts too. Alternative combinations are not automatically tested or supported by this project, so the person maintaining that modified setup is responsible for making sure it works and remains secure.
+
+In short: **the documented setup is the supported starting point; modifications are welcome, but may need additional work.**
+
 ## Choose your AI provider
 
 JARVIS does not require one specific cloud vendor. Configure a supported provider in **Open WebUI → Settings → Admin Settings → Connections**, then make the model available to JARVIS using the configured model IDs.
