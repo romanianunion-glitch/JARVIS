@@ -136,6 +136,44 @@ http://127.0.0.1:3000
 
 The named Docker volume `open-webui` stores persistent Open WebUI data. Do not remove it when updating or restarting JARVIS. Avoid `docker compose down -v` unless you deliberately intend to delete that data.
 
+### Optional Tailscale Serve and the Windows PWA
+
+Tailscale is optional. Install Tailscale for Windows from the [official download page](https://tailscale.com/download/windows), sign in, and connect this PC to your tailnet. Tailscale Serve works the same way on Windows and Linux; only installation and service management differ.
+
+In PowerShell, verify that Tailscale is connected:
+
+```powershell
+tailscale status
+tailscale ip -4
+```
+
+First configure the Windows-specific external PWA manifest in `docker/.env`. Open that file in a text editor and set:
+
+```dotenv
+EXTERNAL_PWA_MANIFEST_URL=https://raw.githubusercontent.com/romanianunion-glitch/JARVIS/main/pwa/manifest.json
+```
+
+This is the Windows/Dum-E manifest. The manifest points to the Windows-themed SVG icon. The Linux guide uses a different manifest and Arch-themed icon.
+
+Apply the setting by recreating the Open WebUI container from the repository root:
+
+```powershell
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml up -d
+```
+
+After Open WebUI is running, publish it privately to your tailnet:
+
+```powershell
+tailscale serve --bg 3000
+tailscale serve status
+```
+
+Open the HTTPS MagicDNS URL shown by Serve status on your other tailnet devices. Serve is private to your tailnet; do not use Funnel. To remove the Serve configuration, run `tailscale serve reset`.
+
+**Install the Windows PWA:** Open the Windows instance's HTTPS MagicDNS URL in Chrome or Edge, then use the browser's **Install app** option. On Android, open that same URL in Chrome and choose **Add to Home screen** or **Install app**. Install it from the Windows instance's own hostname so it keeps the Windows/Dum-E identity.
+
+Official references: [Tailscale Serve](https://tailscale.com/docs/reference/tailscale-cli/serve) · [Open WebUI PWA customization](https://docs.openwebui.com/getting-started/open-webui-as-app/).
+
 ## 7. Configure Open WebUI and choose your AI provider
 
 Open `http://127.0.0.1:3000`, create or sign in to your Open WebUI administrator account, and open **Settings → Admin Settings → Connections**. The exact labels can vary slightly by Open WebUI version.
