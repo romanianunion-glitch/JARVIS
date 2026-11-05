@@ -90,6 +90,43 @@ Use the HTTPS hostname shown by the Serve status on your other tailnet devices. 
 
 Official references: [Tailscale on Linux](https://tailscale.com/docs/install/linux) · [Tailscale Serve](https://tailscale.com/docs/reference/tailscale-cli/serve).
 
+### Use the custom CachyOS PWA through Tailscale Serve
+
+Tailscale Serve works the same way on Arch/CachyOS and Windows. The platform-specific pieces are the Tailscale installation/service commands and the manifest URL.
+
+After completing the first-time Open WebUI setup in section 6, open `docker/.env` from the repository root with nano:
+
+```bash
+nano docker/.env
+```
+
+Set the external manifest URL to the **Arch/CachyOS manifest**:
+
+```dotenv
+EXTERNAL_PWA_MANIFEST_URL=https://raw.githubusercontent.com/romanianunion-glitch/JARVIS/main/pwa/Arch/manifest.json
+```
+
+Save the file, then apply the setting by recreating the Open WebUI container:
+
+```bash
+docker compose --project-directory "$PWD" --env-file docker/.env -f docker/compose.yaml up -d
+```
+
+The external manifest uses the Arch-themed SVG icon. Open WebUI fetches the manifest URL from its server when serving `/manifest.json`; therefore the URL must be reachable from the Open WebUI container/server. The icon URL in the manifest is an absolute GitHub raw URL so browsers can retrieve it.
+
+Now publish Open WebUI privately to your tailnet:
+
+```bash
+tailscale serve --bg 3000
+tailscale serve status
+```
+
+Open the HTTPS MagicDNS hostname shown by Serve status on your other tailnet devices. Tailscale Serve is private to your tailnet; do not use Funnel. To remove the Serve configuration later, run `tailscale serve reset`.
+
+**Install the CachyOS PWA:** Open this instance's HTTPS MagicDNS hostname in Chrome or Edge and choose **Install app**. On Android, open it in Chrome and choose **Add to Home screen** or **Install app**. Install from this CachyOS instance's hostname to keep the Arch/JARVIS branding separate from the Windows instance.
+
+Official references: [Tailscale Serve](https://tailscale.com/docs/reference/tailscale-cli/serve) · [Open WebUI PWA customization](https://docs.openwebui.com/getting-started/open-webui-as-app/).
+
 ## 3. Clone the repository
 
 ```bash
