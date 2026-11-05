@@ -37,20 +37,28 @@ Enable and start Docker:
 sudo systemctl enable --now docker
 ```
 
-Verify Docker and Compose:
-
-```bash
-docker info
-docker compose version
-```
-
-Grant your user permission to run Docker commands:
+Grant your user permission to run Docker commands without `sudo`:
 
 ```bash
 sudo usermod -aG docker "$USER"
 ```
 
-Log out and back in for group membership to take effect.
+**Important:** the new group membership does not apply to terminals that were already open. Log out of your desktop session and log back in (recommended), or start a new shell with:
+
+```bash
+newgrp docker
+```
+
+Then verify that `docker` appears in your group list and test Docker without `sudo`:
+
+```bash
+id -nG
+docker info
+docker compose version
+```
+
+If `docker` is missing from the group list, open a fresh login session and check again. You should not need to prefix normal Docker commands with `sudo` once the new group membership is active.
+
 This permission is required by the current JARVIS launcher unless you configure Docker rootless mode separately.
 **Security note:** membership in the Docker group grants privileges effectively equivalent to root. Only do this if you understand and accept that risk.
 
