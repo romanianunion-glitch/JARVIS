@@ -10,7 +10,7 @@
   "theme_color": "#101820",
   "icons": [
     {
-      "src": "/jarvis-assets/jarvis.svg",
+      "src": "https://raw.githubusercontent.com/romanianunion-glitch/JARVIS/main/pwa/jarvis.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
