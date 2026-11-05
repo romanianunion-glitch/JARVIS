@@ -27,6 +27,8 @@ def generate_env(config, platform=None):
     webui_port = get_config_value(config, "webui", "host_port")
     webui_volume = get_config_value(config, "webui", "volume")
     ollama_port = get_config_value(config, "ollama", "port")
+    manifest_path = "pwa/manifest.json" if platform == "windows" else "pwa/Arch/manifest.json"
+    manifest_url = f"https://raw.githubusercontent.com/romanianunion-glitch/JARVIS/main/{manifest_path}"
 
     values = {
         "JARVIS_NAME": app_name,
@@ -37,7 +39,7 @@ def generate_env(config, platform=None):
         "WEBUI_HOST_PORT": webui_port,
         "WEBUI_VOLUME": webui_volume,
         "OLLAMA_BASE_URL": f"http://host.docker.internal:{ollama_port}",
-        "EXTERNAL_PWA_MANIFEST_URL": "",
+        "EXTERNAL_PWA_MANIFEST_URL": manifest_url,
     }
 
     return "\n".join(
