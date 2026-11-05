@@ -17,6 +17,7 @@ services:
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
       WEBUI_NAME: ${JARVIS_NAME:-Dum-E}
       DEPLOYMENT_ID: ${JARVIS_DEPLOYMENT_ID:-jarvis}
+      EXTERNAL_PWA_MANIFEST_URL: ${EXTERNAL_PWA_MANIFEST_URL:-}
 
 volumes:
   open-webui:
