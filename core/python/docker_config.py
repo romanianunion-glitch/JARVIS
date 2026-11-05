@@ -37,6 +37,7 @@ def generate_env(config, platform=None):
         "WEBUI_HOST_PORT": webui_port,
         "WEBUI_VOLUME": webui_volume,
         "OLLAMA_BASE_URL": f"http://host.docker.internal:{ollama_port}",
+        "EXTERNAL_PWA_MANIFEST_URL": "",
     }
 
     return "\n".join(
